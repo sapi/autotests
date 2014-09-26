@@ -1,4 +1,4 @@
-import config
+from config import MODULES_TO_REPLACE
 
 
 def replace(name, value, replaceAtGlobalScope=True):
@@ -18,7 +18,9 @@ def replace(name, value, replaceAtGlobalScope=True):
         def f(*args, **kwargs):
             old = []
 
-            for module in config.MODULES_TO_REPLACE:
+            modulesToReplace = MODULES_TO_REPLACE
+
+            for module in modulesToReplace:
                 try:
                     oldValue = getattr(module, name)
                 except AttributeError:
@@ -37,7 +39,7 @@ def replace(name, value, replaceAtGlobalScope=True):
             try:
                 result = fn(*args, **kwargs)
             finally:
-                for oldValue,module in zip(old, config.MODULES_TO_REPLACE):
+                for oldValue,module in zip(old, MODULES_TO_REPLACE):
                     if oldValue is not None:
                         setattr(module, name, oldValue)
 

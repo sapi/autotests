@@ -4,7 +4,7 @@ import importlib
 import sys
 import unittest
 
-import config
+from config import cfg
 from results.result import TestResult
 from shared.args import parse_args
 
@@ -16,9 +16,9 @@ def try_import_functions():
     Try to import all of the functions defined in the config file.
 
     """
-    for function in config.FUNCTIONS:
+    for function in cfg.FUNCTIONS:
         try:
-            exec 'from %s import %s'%(config.TEST_SCRIPT_NAME, function)
+            exec 'from %s import %s'%(cfg.TEST_SCRIPT_NAME, function)
         except ImportError:
             pass
         except Exception as e:
@@ -33,10 +33,10 @@ def run_tests(args):
     # This means that we need to set a flag before the import of the tests.
     # The best way I've found so far to do this is really hacky: mess with
     # the config module to set the appropriate arg.
-    setattr(config, 'masters', args.masters)
+    setattr(cfg, 'masters', args.masters)
 
     # Now grab the appropriate test suite, based on the config setting
-    tests = importlib.import_module('suites.%s'%config.SUITE_NAME)
+    tests = importlib.import_module('suites.%s'%cfg.SUITE_NAME)
 
     suite = tests.suite()
 

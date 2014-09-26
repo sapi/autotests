@@ -1,9 +1,8 @@
-import importlib
 import random
 import unittest
 
 from cases.output import IdenticalOutputTests, StreamReplacingTestCase
-import config
+from config import cfg, modules
 from decorators.definition import fail_if_undefined
 from decorators.functions import raise_if_called
 from decorators.output import fail_if_print
@@ -11,18 +10,11 @@ from decorators.replacement import replace
 from decorators.timeout import fail_if_timeout, TimeoutError
 from decorators.utility import simple_description, tests_function
 
-# Do the dynamic imports
-script = config.SCRIPT_MODULE #importlib.import_module(config.TEST_SCRIPT_NAME)
-solution = config.SOLUTION_MODULE
-
-if config.SUPPORT_FILE_NAME is not None:
-    support = importlib.import_module(config.SUPPORT_FILE_NAME)
-
 # Pre-define some useful data sets
 # These are used with the basic functions (we use randomised ones where
 # interaction is required)
 trim = lambda data: [(ti,te,s,arr[-4:]) for (ti,te,s,arr) in data]
-ARRAYS_TRIMMED = support.ARRAYS[-4:]
+ARRAYS_TRIMMED = modules.SUPPORT.ARRAYS[-4:]
 
 DATA_EMPTY = []
 ARRAYS_EMPTY = []
@@ -79,20 +71,20 @@ class LoadDataTests(unittest.TestCase):
     @simple_description('does not handle ValueError')
     @fail_if_print
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'load_data')
+    @fail_if_undefined(modules.SCRIPT, 'load_data')
     def testRaisesValueError(self):
         with self.assertRaises(ValueError):
-            script.load_data('hello')
+            modules.SCRIPT.load_data('hello')
 
     @fail_if_print
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'load_data')
+    @fail_if_undefined(modules.SCRIPT, 'load_data')
     @replace('get_max_data', raise_if_called)
     def _check(self, s, expected):
         # Easier to create a local function to reuse the decorator
         @replace('get_data_for_date', lambda date: s)
         def fn(s):
-            return script.load_data(s)
+            return modules.SCRIPT.load_data(s)
 
         try:
             result = fn(s)
@@ -149,12 +141,12 @@ class LoadDataTests(unittest.TestCase):
 class MaxTemperatureTests(unittest.TestCase):
     @fail_if_print
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'max_temperature')
+    @fail_if_undefined(modules.SCRIPT, 'max_temperature')
     @replace('get_max_data', raise_if_called)
     @replace('get_data_for_date', raise_if_called)
     def _check(self, data, expected):
         try:
-            result = script.max_temperature(data)
+            result = modules.SCRIPT.max_temperature(data)
         except TimeoutError:
             raise
         except Exception as e:
@@ -197,12 +189,12 @@ class MaxTemperatureTests(unittest.TestCase):
 class TotalEnergyTests(unittest.TestCase):
     @fail_if_print
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'total_energy')
+    @fail_if_undefined(modules.SCRIPT, 'total_energy')
     @replace('get_max_data', raise_if_called)
     @replace('get_data_for_date', raise_if_called)
     def _check(self, data, expected):
         try:
-            result = script.total_energy(data)
+            result = modules.SCRIPT.total_energy(data)
         except TimeoutError:
             raise
         except Exception as e:
@@ -242,12 +234,12 @@ class TotalEnergyTests(unittest.TestCase):
 class MaxPowerTests(unittest.TestCase):
     @fail_if_print
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'max_power')
+    @fail_if_undefined(modules.SCRIPT, 'max_power')
     @replace('get_max_data', raise_if_called)
     @replace('get_data_for_date', raise_if_called)
     def _check(self, data, expected):
         try:
-            result = script.max_power(data)
+            result = modules.SCRIPT.max_power(data)
         except TimeoutError:
             raise
         except Exception as e:
@@ -322,11 +314,11 @@ class DisplayStatsTests(StreamReplacingTestCase, IdenticalOutputTests):
     def setUp(self):
         StreamReplacingTestCase.setUp(self)
 
-        self.fSolution = solution.display_stats
-        self.f = script.display_stats
+        self.fSolution = modules.SOLUTION.display_stats
+        self.f = modules.SCRIPT.display_stats
 
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'display_stats')
+    @fail_if_undefined(modules.SCRIPT, 'display_stats')
     def _check(self, sIn, webResult):
         @replace('get_data_for_date', lambda date: webResult)
         def fn(sIn):
@@ -358,7 +350,7 @@ class DisplayStatsTests(StreamReplacingTestCase, IdenticalOutputTests):
 def get_random_results_max(date, cache={}):
     if date not in cache:
         data = [date, random.random()*40, random.random()*1000] \
-                + [random.randint(0, 10e6) for _ in support.ARRAYS]
+                + [random.randint(0, 10e6) for _ in modules.SUPPORT.ARRAYS]
         cache[date] = ','.join(map(str, data))
 
     return cache[date]
@@ -370,7 +362,7 @@ def get_random_results_date(date, cache={}):
 
         for n in range(random.randint(1, 50)):
             data = ['01:%02d'%n, random.random()*40, random.random()*1000] \
-                    + [random.randint(0, 10e6) for _ in support.ARRAYS]
+                    + [random.randint(0, 10e6) for _ in modules.SUPPORT.ARRAYS]
             entries.append(','.join(map(str, data)))
 
         cache[date] = '\n'.join(entries) + '\n'
@@ -383,11 +375,11 @@ class DisplayWeeklyStatsTests(StreamReplacingTestCase, IdenticalOutputTests):
     def setUp(self):
         StreamReplacingTestCase.setUp(self)
 
-        self.fSolution = solution.display_weekly_stats
-        self.f = script.display_weekly_stats
+        self.fSolution = modules.SOLUTION.display_weekly_stats
+        self.f = modules.SCRIPT.display_weekly_stats
 
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'display_weekly_stats')
+    @fail_if_undefined(modules.SCRIPT, 'display_weekly_stats')
     @replace('get_max_data', get_random_results_max)
     def _check(self, sIn, date):
         IdenticalOutputTests._check(self, sIn, date)
@@ -412,11 +404,11 @@ class InteractTests(StreamReplacingTestCase, IdenticalOutputTests):
     def setUp(self):
         StreamReplacingTestCase.setUp(self)
 
-        self.fSolution = solution.interact
-        self.f = script.interact
+        self.fSolution = modules.SOLUTION.interact
+        self.f = modules.SCRIPT.interact
 
     @fail_if_timeout(1)
-    @fail_if_undefined(script, 'interact')
+    @fail_if_undefined(modules.SCRIPT, 'interact')
     @replace('get_data_for_date', get_random_results_date)
     @replace('get_max_data', get_random_results_max)
     def _check(self, sIn):
@@ -513,25 +505,25 @@ class InteractTests(StreamReplacingTestCase, IdenticalOutputTests):
         self._check(s)
 
     @simple_description('masters: single command')
-    @unittest.skipUnless(config.masters, 'Not a masters student')
+    @unittest.skipUnless(cfg.masters, 'Not a masters student')
     def testSingleMastersCommandThenQuit(self):
         s = fWeek('01-07-2014') + fQuit()
         self._check(s)
 
     @simple_description('masters: two commands')
-    @unittest.skipUnless(config.masters, 'Not a masters student')
+    @unittest.skipUnless(cfg.masters, 'Not a masters student')
     def testTwoMastersCommandsThenQuit(self):
         s = fWeek('01-07-2014') + fWeek('01-06-2014') + fQuit()
         self._check(s)
 
     @simple_description('masters: mixed normal and masters commands')
-    @unittest.skipUnless(config.masters, 'Not a masters student')
+    @unittest.skipUnless(cfg.masters, 'Not a masters student')
     def testMixedMastersCommandsThenQuit(self):
         s = fWeek('01-07-2014') + fDate('01-06-2014') + fQuit()
         self._check(s)
 
     @simple_description('masters: invalid week command with three args')
-    @unittest.skipUnless(config.masters, 'Not a masters student')
+    @unittest.skipUnless(cfg.masters, 'Not a masters student')
     def testMastersInvalidWeekCommand(self):
         s = fInvalid('week one two') + fQuit()
         self._check(s)
@@ -549,7 +541,7 @@ def suite():
             loader.loadTestsFromTestCase(InteractTests),
         ]
 
-    if config.masters:
+    if cfg.masters:
         testsToRun.extend([
                 loader.loadTestsFromTestCase(DisplayWeeklyStatsTests),
             ])
