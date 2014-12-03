@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from model.namespaces import Namespace
 
@@ -29,14 +30,20 @@ _d = {
         # Name of test module
         'SUITE_NAME': 'assign1',
         'SUITE_SUPPORT_RELATIVE_DIR': 'suites/support',
+
+        # Support directory (contains solution and other needed files)
+        'SUPPORT_DIR': 'support',
 }
 
 cfg = Namespace(**_d)
+cfg.TEST_SCRIPT_PATH = os.path.join(cfg.SUPPORT_DIR, cfg.TEST_SCRIPT_NAME)
+
+_path = '{dir}.{module}'.format(dir=cfg.SUPPORT_DIR)
 
 _m = {
-        'SCRIPT': cfg.TEST_SCRIPT_NAME,
-        'SOLUTION': cfg.SOLUTION_NAME,
-        'SUPPORT': cfg.SUPPORT_NAME,
+        'SCRIPT': _path.format(module=cfg.TEST_SCRIPT_NAME),
+        'SOLUTION': _path.format(module=cfg.SOLUTION_NAME),
+        'SUPPORT': _path.format(module=cfg.SUPPORT_NAME),
 }
 
 # The test script will not be valid on the first run (but also not used)

@@ -16,7 +16,7 @@ def copy_script(args):
     So we copy the script to a known location to play with.
 
     """
-    cmd = 'cp %s %s.py'%(args.path, cfg.TEST_SCRIPT_NAME)
+    cmd = 'cp %s %s.py'%(args.path, cfg.TEST_SCRIPT_PATH)
     child = subprocess.Popen(cmd, shell=True)
     child.wait()
 
