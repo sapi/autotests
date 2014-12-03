@@ -152,41 +152,13 @@ class PVDataArraySizeTests(PVDataTestSetup):
 def suite():
     loader = unittest.TestLoader()
 
-    staticTestClasses = [
+    testClasses = [
             PVDataTaskSheetTests,
             PVDataAdvancedTests,
         ]
 
-    arraySizeTestClasses = [
-            PVDataArraySizeTests,
-        ]
-
     if cfg.masters:
         pass
-
-    # Apply tests with shorter and longer arrays
-    def copy_class(cls):
-        class AhemThisIsACopy(cls):
-            pass
-        return AhemThisIsACopy
-
-    def add_annotation(annotation):
-        def f(cls):
-            cls.FUNCTION_TESTED += ' (%s)'%annotation
-            return cls
-
-        return f
-
-    fShorter = apply_to_test_case_methods(replace('ARRAYS', ARRAYS_SHORTER))
-    shorterTestClasses = map(fShorter, map(copy_class, arraySizeTestClasses))
-    shorterTestClasses = map(add_annotation('less arrays'), shorterTestClasses)
-
-    fLonger = apply_to_test_case_methods(replace('ARRAYS', ARRAYS_LONGER))
-    longerTestClasses = map(fLonger, map(copy_class, arraySizeTestClasses))
-    longerTestClasses = map(add_annotation('more arrays'), longerTestClasses)
-
-    # Add
-    testClasses = staticTestClasses + shorterTestClasses + longerTestClasses
 
     testsToRun = map(loader.loadTestsFromTestCase, testClasses)
     suite = unittest.TestSuite(testsToRun)
