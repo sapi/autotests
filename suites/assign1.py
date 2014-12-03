@@ -1,7 +1,5 @@
-import random
 import unittest
 
-from cases.output import IdenticalOutputTests, StreamReplacingTestCase
 from config import cfg, modules
 from decorators.definition import fail_if_undefined
 from decorators.functions import raise_if_called
@@ -9,6 +7,7 @@ from decorators.output import fail_if_print
 from decorators.replacement import replace
 from decorators.timeout import fail_if_timeout, TimeoutError
 from decorators.utility import simple_description, tests_function
+from model.cases.output import IdenticalOutputTests, StreamReplacingTestCase
 from suites.support.assign1 import get_data_for_date as get_random_results_date
 from suites.support.assign1 import get_max_data as get_random_results_max
 
