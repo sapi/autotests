@@ -38,7 +38,13 @@ _m = {
         'SOLUTION': cfg.SOLUTION_NAME,
         'SUPPORT': cfg.SUPPORT_NAME,
 }
-_m = {k: importlib.import_module(v) for k,v in _m.iteritems()}
+
+# The test script will not be valid on the first run (but also not used)
+for _attr,_n in _m.iteritems():
+    try:
+        _m[_attr] = importlib.import_module(_n)
+    except ImportError:
+        pass
 
 modules = Namespace(**_m)
 
