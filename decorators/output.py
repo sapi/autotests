@@ -1,3 +1,4 @@
+from functools import wraps
 from StringIO import StringIO
 import sys
 
@@ -11,14 +12,17 @@ def fail_if_print(fn):
     Precondition: must be applied to a TestCase class.
 
     """
+    @wraps(fn)
     def f(self, *args, **kwargs):
         sys.stdout, oldstdout = StringIO(), sys.stdout
 
-        fn(self, *args, **kwargs)
+        result = fn(self, *args, **kwargs)
 
         self.assertEqual(sys.stdout.getvalue(), '',
                 'Unexpected output in function')
 
         sys.stdout = oldstdout
+
+        return result
 
     return f

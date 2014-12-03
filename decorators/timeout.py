@@ -1,3 +1,4 @@
+from functools import wraps
 import signal
 
 
@@ -21,6 +22,7 @@ def fail_if_timeout(timeout=2):
         raise TimeoutError()
 
     def decorator(fn):
+        @wraps(fn)
         def f(self, *args, **kwargs):
             old = signal.signal(signal.SIGALRM, handler)
 

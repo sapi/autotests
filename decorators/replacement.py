@@ -1,3 +1,5 @@
+from functools import wraps
+
 from config import MODULES_TO_REPLACE
 
 
@@ -15,6 +17,7 @@ def replace(name, value, replaceAtGlobalScope=True):
 
     """
     def decorator(fn):
+        @wraps(fn)
         def f(*args, **kwargs):
             old = []
 

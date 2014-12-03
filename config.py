@@ -28,6 +28,7 @@ _d = {
 
         # Name of test module
         'SUITE_NAME': 'assign1',
+        'SUITE_SUPPORT_RELATIVE_DIR': 'suites/support',
 }
 
 cfg = Namespace(**_d)
@@ -44,4 +45,5 @@ modules = Namespace(**_m)
 MODULES_TO_REPLACE = [
         modules.SCRIPT,
         modules.SOLUTION,
+        modules.SUPPORT,
     ]
