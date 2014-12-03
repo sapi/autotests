@@ -38,7 +38,7 @@ _d = {
 cfg = Namespace(**_d)
 cfg.TEST_SCRIPT_PATH = os.path.join(cfg.SUPPORT_DIR, cfg.TEST_SCRIPT_NAME)
 
-_path = '{dir}.{module}'.format(dir=cfg.SUPPORT_DIR)
+_path = '{dir}.{{module}}'.format(dir=cfg.SUPPORT_DIR)
 
 _m = {
         'SCRIPT': _path.format(module=cfg.TEST_SCRIPT_NAME),
